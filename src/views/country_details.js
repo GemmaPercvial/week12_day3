@@ -1,38 +1,44 @@
 const PubSub = require('../helpers/pub_sub')
 
-const CountryDetails = function(container){
+const CountryDetails = function (container) {
   this.container = container;
 };
 
-CountryDetails.prototype.bindEvents = function(){
+CountryDetails.prototype.bindEvents = function () {
   PubSub.subscribe('Countries::country-selected', (event) => {
-    const details = event.detail;
-    this.render(details);
+    this.render(event.detail);
   });
 };
 
 CountryDetails.prototype.render = function(country) {
-  this.container.innerHTML = '';
 
-  const countryName = this.createElement('h3');
-  countryName.textContent = country.name
+  const countryName = this.createTextElement('h2', country.name);
   this.container.appendChild(countryName);
 
-  const countryCapital = this.createElement('p');
-  countryCapital.textContent = `Capital: ${country.capital}`
+  const flagImage = document.createElement('img');
+  flagImage.src = country.flag;
+  this.container.appendChild(flagImage);
+
+  const countryCapital = this.createTextElement('p', `Capital: ${country.capital}`);
   this.container.appendChild(countryCapital);
 
-  const countryRegion = this.createElement('p');
-  countryRegion.textContent = `Region: ${country.region}`
+  const countryRegion = this.createTextElement('p', `Region: ${country.region}`);
   this.container.appendChild(countryRegion);
 
-  const countryCurrencies = this.createLi('li');
-  countryCurrencies.textContent = (`Currencies: ${country.currencies}`, infoList)
-  this.container.appendChild(countryCurrencies);
+  const languagesListTitle = this.createTextElement('p', 'Languages:');
+  this.container.appendChild(languagesListTitle);
 
-  const countryLanguages = this.createLi('li');
-  countryLanguages.textContent = (`Languages: ${country.languages}`, infoList)
-  this.container.appendChild(countryLanguages);
+  const languagesList = document.createElement('ul');
+  this.populateLanguageList(country.languages, languagesList);
+  this.container.appendChild(languagesList);
+
+  const currenciesListTitle = this.createTextElement('p', 'Currencies:');
+  this.container.appendChild(currenciesListTitle);
+
+  const currenciesList = document.createElement('ul');
+  this.populateCurrenciesList(country.currencies, currenciesList);
+  this.container.appendChild(currenciesList);
+
 };
 
 CountryDetails.prototype.createElement = function (elementType, text) {
@@ -41,10 +47,30 @@ CountryDetails.prototype.createElement = function (elementType, text) {
   return element;
 };
 
-CountryDetails.prototype.createLi = function(textContent, ul) {
-  const li = document.createElement('li');
-  li.textContent = textContent;
-  ul.appendChild(li);
+CountryDetails.prototype.createTextElement = function (elementType, text) {
+  const element = document.createElement(elementType);
+  element.textContent = text;
+  return element;
+};
+
+CountryDetails.prototype.populateLanguageList = function (languages, list) {
+  languages.forEach((language) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = language.name;
+    list.appendChild(listItem);
+  });
+};
+
+CountryDetails.prototype.populateCurrenciesList = function (currencies, list) {
+  currencies.forEach((currencies) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = currencies.name;
+    list.appendChild(listItem);
+  });
+};
+
+CountryDetails.prototype.clearCountry = function () {
+  this.container.innerHTML = '';
 };
 
 module.exports = CountryDetails;
